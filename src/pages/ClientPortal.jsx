@@ -16,6 +16,7 @@ import {
   supabase,
   usernameToEmail,
 } from "../lib/supabase";
+import { getAuthErrorMessage } from "../lib/authErrors";
 import usePortalSession from "../hooks/usePortalSession";
 
 function Shell({ children }) {
@@ -36,11 +37,15 @@ function planFileName(path) {
   return storedName || "warehouse-plan.pdf";
 }
 
-function Login({ onLogin }) {
+function Login({ onLogin, initialError = "" }) {
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    setError(initialError);
+  }, [initialError]);
 
   const submit = async (event) => {
     event.preventDefault();
@@ -51,16 +56,26 @@ function Login({ onLogin }) {
       setBusy(false);
       return;
     }
-    const { data, error: authError } = await supabase.auth.signInWithPassword({
-      email: usernameToEmail(user),
-      password,
-    });
-    if (authError) setError(authError.message);
-    else if (data.user.app_metadata?.role !== "client") {
-      await supabase.auth.signOut();
-      setError("Please use a client account.");
-    } else onLogin(data.user);
-    setBusy(false);
+    try {
+      const { data, error: authError } = await supabase.auth.signInWithPassword(
+        {
+          email: usernameToEmail(user),
+          password,
+        },
+      );
+      if (authError) {
+        setError(getAuthErrorMessage(authError));
+      } else if (data?.user?.app_metadata?.role !== "client") {
+        await supabase.auth.signOut();
+        setError("Please use a client account.");
+      } else {
+        onLogin(data.user);
+      }
+    } catch (loginError) {
+      setError(getAuthErrorMessage(loginError));
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -83,7 +98,12 @@ function Login({ onLogin }) {
 }
 
 export default function ClientPortal() {
-  const { user, setUser, loading: sessionLoading } = usePortalSession("client");
+  const {
+    user,
+    setUser,
+    loading: sessionLoading,
+    sessionError,
+  } = usePortalSession("client");
   const [client, setClient] = useState(null);
   const [photos, setPhotos] = useState([]);
   const [modelUpdates, setModelUpdates] = useState([]);
@@ -202,7 +222,7 @@ export default function ClientPortal() {
         />
       </Shell>
     );
-  if (!user) return <Login onLogin={setUser} />;
+  if (!user) return <Login onLogin={setUser} initialError={sessionError} />;
   if (error || !client)
     return (
       <Shell>

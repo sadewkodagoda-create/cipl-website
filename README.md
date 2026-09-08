@@ -25,9 +25,10 @@ Client usernames are converted internally to `<username>@cipl.lk`. New client pa
 - Public inquiry writes are accepted only through `submit-inquiry`; the public Supabase key cannot insert directly into the table.
 - Inquiry submissions are limited to five per browser/network fingerprint every 15 minutes.
 - Admin functions verify the authenticated user's immutable `app_metadata.role` before using service-role privileges.
+- Vercel calls `/api/supabase-health` once daily using the Production-only `CRON_SECRET`. The endpoint performs one read-only, RLS-protected database query and never returns row data.
 - `vercel.json` adds SPA fallbacks, long-lived static asset caching, and production security headers. If deploying somewhere other than Vercel, mirror those headers and route all application paths to `index.html`.
-- Keep `.env`, the service-role key, and the rate-limit salt out of source control. Only variables prefixed with `VITE_` are bundled into the browser.
+- Keep `.env`, `CRON_SECRET`, the service-role key, and the rate-limit salt out of source control. Only variables prefixed with `VITE_` are bundled into the browser.
 
 ## Verification
 
-Run `pnpm lint` and `pnpm build` before deployment. Test `/`, `/client`, and `/admin` as direct URLs after deployment to confirm the SPA fallback and security headers are active.
+Run `pnpm test`, `pnpm lint`, and `pnpm build` before deployment. Test `/`, `/client`, and `/admin` as direct URLs after deployment to confirm the SPA fallback and security headers are active.

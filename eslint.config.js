@@ -6,6 +6,14 @@ import reactRefresh from "eslint-plugin-react-refresh";
 export default [
   { ignores: ["dist", "supabase/functions"] },
   js.configs.recommended,
+  {
+    files: ["api/**/*.js", "tests/**/*.js"],
+    languageOptions: {
+      ecmaVersion: "latest",
+      globals: globals.node,
+      sourceType: "module",
+    },
+  },
   reactHooks.configs.flat.recommended,
   {
     files: ["**/*.{js,jsx}"],

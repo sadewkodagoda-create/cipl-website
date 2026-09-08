@@ -24,6 +24,7 @@ import {
   supabase,
   usernameToEmail,
 } from "../lib/supabase";
+import { getAuthErrorMessage } from "../lib/authErrors";
 import {
   formatFileSize,
   isGlbFile,
@@ -52,11 +53,15 @@ const empty = {
   pdf_plan_url: "",
 };
 
-function Login({ onLogin }) {
+function Login({ onLogin, initialError = "" }) {
   const [user, setUser] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    setError(initialError);
+  }, [initialError]);
 
   const submit = async (event) => {
     event.preventDefault();
@@ -67,16 +72,26 @@ function Login({ onLogin }) {
       setError("Connect Supabase in .env to authenticate.");
       return;
     }
-    const { data, error: authError } = await supabase.auth.signInWithPassword({
-      email: usernameToEmail(user),
-      password,
-    });
-    if (authError) setError(authError.message);
-    else if (data.user.app_metadata?.role !== "admin") {
-      await supabase.auth.signOut();
-      setError("This account does not have administrator access.");
-    } else onLogin(data.user);
-    setLoading(false);
+    try {
+      const { data, error: authError } = await supabase.auth.signInWithPassword(
+        {
+          email: usernameToEmail(user),
+          password,
+        },
+      );
+      if (authError) {
+        setError(getAuthErrorMessage(authError));
+      } else if (data?.user?.app_metadata?.role !== "admin") {
+        await supabase.auth.signOut();
+        setError("This account does not have administrator access.");
+      } else {
+        onLogin(data.user);
+      }
+    } catch (loginError) {
+      setError(getAuthErrorMessage(loginError));
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -113,7 +128,7 @@ function PortalShell({ title, kicker, children }) {
 }
 
 export default function AdminPortal() {
-  const { user, setUser, loading } = usePortalSession("admin");
+  const { user, setUser, loading, sessionError } = usePortalSession("admin");
   const [clients, setClients] = useState([]);
   const [selected, setSelected] = useState(null);
   const [error, setError] = useState("");
@@ -126,7 +141,10 @@ export default function AdminPortal() {
       )
       .order("created_at", { ascending: false });
     if (loadError) setError(loadError.message);
-    else setClients(data || []);
+    else {
+      setError("");
+      setClients(data || []);
+    }
   };
 
   useEffect(() => {
@@ -140,7 +158,7 @@ export default function AdminPortal() {
       </PortalShell>
     );
   }
-  if (!user) return <Login onLogin={setUser} />;
+  if (!user) return <Login onLogin={setUser} initialError={sessionError} />;
   if (selected) {
     return (
       <ClientEditor
