@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import {
@@ -10,14 +10,18 @@ import {
   CheckCircle,
   EnvelopeSimple,
   Handshake,
+  Images,
   Phone,
   ShieldCheck,
   UsersThree,
 } from "@phosphor-icons/react";
 import Reveal from "../components/Reveal";
 import SitePreparationComparison from "../components/SitePreparationComparison";
+import { CLIENT_PROJECTS } from "../lib/clientProjects";
 import { STAGES } from "../lib/constants";
 import { isSupabaseConfigured, supabase } from "../lib/supabase";
+
+const ProjectGallery = lazy(() => import("../components/ProjectGallery"));
 
 const EMPTY_INQUIRY = {
   name: "",
@@ -33,12 +37,19 @@ const clients = [
     name: "TVS Lanka",
     src: "/clients/tvs-lanka.jpg",
     className: "h-16 w-16 rounded-full",
+    project: CLIENT_PROJECTS.tvs,
   },
-  { name: "Rocell", src: "/clients/rocell.jpg", className: "h-16 w-16" },
+  {
+    name: "Rocell",
+    src: "/clients/rocell.jpg",
+    className: "h-16 w-16",
+    project: CLIENT_PROJECTS.rocell,
+  },
   {
     name: "Spa Ceylon",
     src: "/clients/spa-ceylon-optimized.webp",
     className: "h-16 w-full max-w-[180px]",
+    project: CLIENT_PROJECTS.spaCeylon,
   },
   {
     name: "Maliban",
@@ -49,6 +60,13 @@ const clients = [
     name: "Space Logistics",
     src: "/clients/space-logistics-navy.webp",
     className: "h-12 w-full max-w-[180px]",
+    project: CLIENT_PROJECTS.spaceLogistics,
+  },
+  {
+    name: "KAP",
+    src: "/clients/kap-logo.png",
+    className: "h-14 w-full max-w-[160px]",
+    project: CLIENT_PROJECTS.kap,
   },
 ];
 
@@ -170,6 +188,7 @@ export default function Home() {
   const location = useLocation();
   const [form, setForm] = useState(EMPTY_INQUIRY);
   const [state, setState] = useState("idle");
+  const [activeProject, setActiveProject] = useState(null);
 
   const submit = async (event) => {
     event.preventDefault();
@@ -333,29 +352,65 @@ export default function Home() {
               space delivered as promised.
             </p>
           </Reveal>
-          <div className="client-logo-wall mt-14 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+          <div className="client-logo-wall mt-14 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
             {clients.map((client, index) => (
               <Reveal
                 key={client.name}
                 delay={index * 0.05}
-                className="client-logo-cell"
-                hover
+                className={`client-logo-cell${client.project ? " client-logo-cell-interactive" : ""}`}
+                hover={Boolean(client.project)}
               >
-                <motion.img
-                  src={client.src}
-                  alt={`${client.name} logo`}
-                  loading="lazy"
-                  className={`client-logo object-contain ${client.className}`}
-                  whileHover={
-                    reduceMotion ? undefined : { y: -4, scale: 1.025 }
-                  }
-                  transition={{ type: "spring", stiffness: 260, damping: 22 }}
-                />
+                {client.project ? (
+                  <button
+                    type="button"
+                    className="client-logo-trigger"
+                    onClick={() => setActiveProject(client.project)}
+                    aria-haspopup="dialog"
+                    aria-label={`View ${client.name} project gallery`}
+                  >
+                    <img
+                      src={client.src}
+                      alt={`${client.name} logo`}
+                      loading="lazy"
+                      decoding="async"
+                      className={`client-logo object-contain ${client.className}`}
+                    />
+                    <span className="client-logo-gallery-badge" aria-hidden="true">
+                      <Images size={15} />
+                    </span>
+                    <span className="client-logo-gallery-cue" aria-hidden="true">
+                      View project
+                    </span>
+                  </button>
+                ) : (
+                  <img
+                    src={client.src}
+                    alt={`${client.name} logo`}
+                    loading="lazy"
+                    decoding="async"
+                    className={`client-logo object-contain ${client.className}`}
+                  />
+                )}
               </Reveal>
             ))}
           </div>
         </div>
       </section>
+
+      <Suspense
+        fallback={
+          <div className="project-gallery-backdrop project-gallery-loading" role="status">
+            <span>Opening project gallery…</span>
+          </div>
+        }
+      >
+        {activeProject ? (
+          <ProjectGallery
+            project={activeProject}
+            onClose={() => setActiveProject(null)}
+          />
+        ) : null}
+      </Suspense>
 
       <section className="section why-section">
         <div className="shell">

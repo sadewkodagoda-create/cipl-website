@@ -41,7 +41,7 @@
       ]
     },
     {
-      "source": "/(fonts|site-photos|clients)/(.*)",
+      "source": "/(fonts|site-photos|clients|client-projects)/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
