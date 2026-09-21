@@ -1,11 +1,13 @@
+const PROJECT_PHOTO_VERSION = "20260922";
+
 function createPhotos(slug, projectName, count) {
   return Array.from({ length: count }, (_, index) => {
     const number = String(index + 1).padStart(2, "0");
     const basePath = `/client-projects/${slug}/${slug}-${number}`;
 
     return {
-      src: `${basePath}.webp`,
-      thumbnail: `${basePath}-thumb.webp`,
+      src: `${basePath}.webp?v=${PROJECT_PHOTO_VERSION}`,
+      thumbnail: `${basePath}-thumb.webp?v=${PROJECT_PHOTO_VERSION}`,
       alt: `${projectName} construction project, photo ${index + 1} of ${count}`,
     };
   });
