@@ -20,21 +20,21 @@ export const CLIENT_PROJECTS = {
   rocell: {
     id: "rocell",
     name: "Rocell",
-    photos: createPhotos("rocell", "Rocell", 14),
+    photos: createPhotos("rocell", "Rocell", 8),
   },
   spaCeylon: {
     id: "spa-ceylon",
     name: "Spa Ceylon",
-    photos: createPhotos("spa-ceylon", "Spa Ceylon", 9),
+    photos: createPhotos("spa-ceylon", "Spa Ceylon", 4),
   },
   spaceLogistics: {
     id: "space-logistics",
     name: "Space Logistics",
-    photos: createPhotos("space-logistics", "Space Logistics", 7),
+    photos: createPhotos("space-logistics", "Space Logistics", 6),
   },
   tvs: {
     id: "tvs",
     name: "TVS Lanka",
-    photos: createPhotos("tvs", "TVS Lanka", 8),
+    photos: createPhotos("tvs", "TVS Lanka", 5),
   },
 };
