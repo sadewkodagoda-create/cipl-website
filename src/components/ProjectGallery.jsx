@@ -5,6 +5,7 @@ import {
   CaretLeft,
   CaretRight,
   Images,
+  MagnifyingGlassPlus,
   X,
 } from "@phosphor-icons/react";
 
@@ -15,7 +16,10 @@ export default function ProjectGallery({ project, onClose }) {
   const [selectedIndex, setSelectedIndex] = useState(null);
   const dialogRef = useRef(null);
   const closeButtonRef = useRef(null);
+  const scrollRef = useRef(null);
+  const galleryPositionRef = useRef({ scrollTop: 0, photoIndex: null });
   const touchStartXRef = useRef(null);
+  const touchStartYRef = useRef(null);
   const photos = project.photos;
   const lightboxOpen = selectedIndex !== null;
   const currentPhoto = lightboxOpen ? photos[selectedIndex] : null;
@@ -35,16 +39,28 @@ export default function ProjectGallery({ project, onClose }) {
   useEffect(() => {
     const previouslyFocused = document.activeElement;
     const previousOverflow = document.body.style.overflow;
+    const pageRoot = document.getElementById("root");
+    const previousInert = pageRoot?.inert;
     document.body.style.overflow = "hidden";
+    if (pageRoot) pageRoot.inert = true;
 
     return () => {
       document.body.style.overflow = previousOverflow;
+      if (pageRoot) pageRoot.inert = previousInert;
       previouslyFocused?.focus?.();
     };
   }, []);
 
   useEffect(() => {
-    closeButtonRef.current?.focus();
+    const { scrollTop, photoIndex } = galleryPositionRef.current;
+    if (!lightboxOpen && photoIndex !== null && scrollRef.current) {
+      scrollRef.current.scrollTop = scrollTop;
+      scrollRef.current
+        .querySelector(`[data-photo-index="${photoIndex}"]`)
+        ?.focus({ preventScroll: true });
+    } else {
+      closeButtonRef.current?.focus();
+    }
   }, [lightboxOpen]);
 
   useEffect(() => {
@@ -106,16 +122,30 @@ export default function ProjectGallery({ project, onClose }) {
 
   const handleTouchStart = (event) => {
     touchStartXRef.current = event.changedTouches[0]?.clientX ?? null;
+    touchStartYRef.current = event.changedTouches[0]?.clientY ?? null;
   };
 
   const handleTouchEnd = (event) => {
     const startX = touchStartXRef.current;
     const endX = event.changedTouches[0]?.clientX;
+    const startY = touchStartYRef.current;
+    const endY = event.changedTouches[0]?.clientY;
     touchStartXRef.current = null;
-    if (startX === null || endX === undefined) return;
+    touchStartYRef.current = null;
+    if (
+      startX === null ||
+      endX === undefined ||
+      startY === null ||
+      endY === undefined
+    )
+      return;
 
     const distance = endX - startX;
-    if (Math.abs(distance) < 48) return;
+    if (
+      Math.abs(distance) < 48 ||
+      Math.abs(distance) <= Math.abs(endY - startY)
+    )
+      return;
     if (distance > 0) showPrevious();
     else showNext();
   };
@@ -152,10 +182,12 @@ export default function ProjectGallery({ project, onClose }) {
               </span>
             )}
             <h2 id="project-gallery-title">{project.name}</h2>
-            <p>
+            <p aria-live="polite" aria-atomic="true">
               {currentPhoto
                 ? `Photo ${selectedIndex + 1} of ${photos.length}`
-                : `${photos.length} project ${photos.length === 1 ? "photo" : "photos"}`}
+                : photos.length === 0
+                  ? "Project photo gallery"
+                  : `${photos.length} project ${photos.length === 1 ? "photo" : "photos"}. Select a photo to view in full.`}
             </p>
           </div>
           <button
@@ -170,67 +202,116 @@ export default function ProjectGallery({ project, onClose }) {
         </header>
 
         {currentPhoto ? (
-          <div
-            className="project-lightbox-stage"
-            onTouchStart={handleTouchStart}
-            onTouchEnd={handleTouchEnd}
-          >
-            <button
-              type="button"
-              className="project-lightbox-nav project-lightbox-previous"
-              onClick={showPrevious}
-              aria-label="Show previous project photo"
+          <div className="project-lightbox-content">
+            <div
+              className="project-lightbox-stage"
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
             >
-              <CaretLeft size={25} weight="bold" aria-hidden="true" />
-            </button>
-            <figure className="project-lightbox-figure">
-              <div className="project-lightbox-image-wrap">
-                <img
-                  key={currentPhoto.src}
-                  src={currentPhoto.src}
-                  alt={currentPhoto.alt}
-                  decoding="async"
-                />
-              </div>
-              <figcaption>
-                <span>{project.name}</span>
-                <span>
-                  {selectedIndex + 1} / {photos.length}
-                </span>
-              </figcaption>
-            </figure>
-            <button
-              type="button"
-              className="project-lightbox-nav project-lightbox-next"
-              onClick={showNext}
-              aria-label="Show next project photo"
+              <button
+                type="button"
+                className="project-lightbox-nav project-lightbox-previous"
+                onClick={showPrevious}
+                aria-label="Show previous project photo"
+              >
+                <CaretLeft size={25} weight="bold" aria-hidden="true" />
+              </button>
+              <figure className="project-lightbox-figure">
+                <div className="project-lightbox-image-wrap">
+                  <img
+                    key={currentPhoto.src}
+                    src={currentPhoto.src}
+                    alt={currentPhoto.alt}
+                    width={currentPhoto.width}
+                    height={currentPhoto.height}
+                    decoding="async"
+                  />
+                </div>
+                <figcaption>
+                  <span>{project.name}</span>
+                  <span>
+                    {selectedIndex + 1} / {photos.length}
+                  </span>
+                </figcaption>
+              </figure>
+              <button
+                type="button"
+                className="project-lightbox-nav project-lightbox-next"
+                onClick={showNext}
+                aria-label="Show next project photo"
+              >
+                <CaretRight size={25} weight="bold" aria-hidden="true" />
+              </button>
+            </div>
+            <nav
+              className="project-lightbox-filmstrip"
+              aria-label={`${project.name} photos`}
             >
-              <CaretRight size={25} weight="bold" aria-hidden="true" />
-            </button>
-          </div>
-        ) : (
-          <div className="project-gallery-scroll">
-            <div className="project-gallery-grid">
               {photos.map((photo, index) => (
                 <button
                   key={photo.src}
                   type="button"
-                  className="project-gallery-thumb"
+                  className="project-lightbox-preview"
                   onClick={() => setSelectedIndex(index)}
+                  aria-label={`View photo ${index + 1} of ${photos.length}`}
+                  aria-pressed={index === selectedIndex}
+                >
+                  <img src={photo.thumbnail} alt="" decoding="async" />
+                  <span aria-hidden="true">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                </button>
+              ))}
+            </nav>
+          </div>
+        ) : (
+          <div ref={scrollRef} className="project-gallery-scroll">
+            {photos.length === 0 && (
+              <div className="project-gallery-empty">
+                <Images size={40} weight="light" aria-hidden="true" />
+                <h3>No project photos available yet.</h3>
+                <p>Please explore our other company galleries.</p>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={onClose}
+                >
+                  Back to projects
+                </button>
+              </div>
+            )}
+            <div
+              className={`project-gallery-grid${photos.length === 4 ? " project-gallery-grid-three" : ""}`}
+            >
+              {photos.map((photo, index) => (
+                <button
+                  key={photo.src}
+                  type="button"
+                  className={`project-gallery-thumb${index === 0 ? " project-gallery-feature" : ""}`}
+                  data-photo-index={index}
+                  onClick={() => {
+                    galleryPositionRef.current = {
+                      scrollTop: scrollRef.current.scrollTop,
+                      photoIndex: index,
+                    };
+                    setSelectedIndex(index);
+                  }}
                   aria-label={`Open ${photo.alt}`}
                 >
                   <span className="project-gallery-thumb-image">
                     <img
-                      src={photo.thumbnail}
+                      src={index === 0 ? photo.src : photo.thumbnail}
                       alt=""
                       aria-hidden="true"
-                      loading="lazy"
+                      width={photo.width}
+                      height={photo.height}
+                      loading={index === 0 ? "eager" : "lazy"}
                       decoding="async"
                     />
                   </span>
                   <span className="project-gallery-thumb-label">
-                    <span>Project photo</span>
-                    <span>{String(index + 1).padStart(2, "0")}</span>
+                    <span>Photo {String(index + 1).padStart(2, "0")}</span>
+                    <MagnifyingGlassPlus size={19} aria-hidden="true" />
                   </span>
                 </button>
               ))}

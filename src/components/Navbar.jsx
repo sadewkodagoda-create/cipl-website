@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { List, X } from "@phosphor-icons/react";
-import { useReducedMotion } from "framer-motion";
+import useMotionPreference from "../hooks/useMotionPreference";
 
 const NAV_ITEMS = [
   ["Home", "/"],
@@ -15,7 +15,7 @@ export default function Navbar() {
   const scrollMarker = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useMotionPreference();
 
   useEffect(() => {
     const marker = scrollMarker.current;
