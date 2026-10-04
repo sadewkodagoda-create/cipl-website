@@ -12,6 +12,9 @@ import {
 const FOCUSABLE_SELECTOR =
   'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
+const LIGHTBOX_SIZES = "(max-width: 767px) 100vw, (max-width: 1200px) calc(100vw - 152px), 1080px";
+const photoSources = (photo) => `${photo.thumbnail} 800w, ${photo.src} ${photo.width}w`;
+
 export default function ProjectGallery({ project, onClose }) {
   const [selectedIndex, setSelectedIndex] = useState(null);
   const dialogRef = useRef(null);
@@ -47,7 +50,7 @@ export default function ProjectGallery({ project, onClose }) {
     return () => {
       document.body.style.overflow = previousOverflow;
       if (pageRoot) pageRoot.inert = previousInert;
-      previouslyFocused?.focus?.();
+      previouslyFocused?.focus?.({ preventScroll: true });
     };
   }, []);
 
@@ -59,7 +62,7 @@ export default function ProjectGallery({ project, onClose }) {
         .querySelector(`[data-photo-index="${photoIndex}"]`)
         ?.focus({ preventScroll: true });
     } else {
-      closeButtonRef.current?.focus();
+      closeButtonRef.current?.focus({ preventScroll: true });
     }
   }, [lightboxOpen]);
 
@@ -116,6 +119,8 @@ export default function ProjectGallery({ project, onClose }) {
     ];
     adjacentIndexes.forEach((index) => {
       const image = new Image();
+      image.sizes = LIGHTBOX_SIZES;
+      image.srcset = photoSources(photos[index]);
       image.src = photos[index].src;
     });
   }, [photos, selectedIndex]);
@@ -221,6 +226,8 @@ export default function ProjectGallery({ project, onClose }) {
                   <img
                     key={currentPhoto.src}
                     src={currentPhoto.src}
+                    srcSet={photoSources(currentPhoto)}
+                    sizes={LIGHTBOX_SIZES}
                     alt={currentPhoto.alt}
                     width={currentPhoto.width}
                     height={currentPhoto.height}
@@ -301,6 +308,8 @@ export default function ProjectGallery({ project, onClose }) {
                   <span className="project-gallery-thumb-image">
                     <img
                       src={index === 0 ? photo.src : photo.thumbnail}
+                      srcSet={photoSources(photo)}
+                      sizes={index === 0 ? "(max-width: 767px) calc(100vw - 32px), (max-width: 1200px) calc(100vw - 96px), 1120px" : "(max-width: 767px) calc(100vw - 32px), 520px"}
                       alt=""
                       aria-hidden="true"
                       width={photo.width}

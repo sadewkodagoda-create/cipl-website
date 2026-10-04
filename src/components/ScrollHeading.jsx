@@ -9,9 +9,9 @@ export default function ScrollHeading({
   className = "",
   ...props
 }) {
-  const { ref, progress, momentum, reduceMotion } = useScrollFrame();
+  const { ref, progress, active, momentum, reduceMotion } = useScrollFrame();
   const frame = useTransform(() =>
-    headingFrame(reduceMotion ? 0.5 : progress.get(), momentum?.get() ?? 0),
+    headingFrame(reduceMotion ? 0.5 : progress.get(), reduceMotion || !active ? 0 : (momentum?.get() ?? 0)),
   );
   const fold = useTransform(frame, (value) => `${value.fold}deg`);
   const stretch = useTransform(frame, (value) => value.stretch);

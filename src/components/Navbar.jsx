@@ -13,6 +13,7 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const scrollMarker = useRef(null);
+  const menuButton = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
   const reduceMotion = useMotionPreference();
@@ -35,7 +36,10 @@ export default function Navbar() {
   useEffect(() => {
     if (!open) return undefined;
     const closeOnEscape = (event) => {
-      if (event.key === "Escape") setOpen(false);
+      if (event.key === "Escape") {
+        setOpen(false);
+        menuButton.current?.focus();
+      }
     };
     document.addEventListener("keydown", closeOnEscape);
     return () => document.removeEventListener("keydown", closeOnEscape);
@@ -76,7 +80,7 @@ export default function Navbar() {
           >
             <span className="grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-full bg-white shadow-[inset_0_1px_0_rgba(255,255,255,.95),0_4px_14px_rgba(18,50,84,.1)]">
               <img
-                src="/cipl-logo.jpg"
+                src="/cipl-logo.webp"
                 alt="CIPL"
                 className="h-full w-full object-contain"
               />
@@ -90,6 +94,7 @@ export default function Navbar() {
           </Link>
 
           <button
+            ref={menuButton}
             className="grid min-h-11 min-w-11 place-items-center rounded-full text-[var(--ink)] transition-colors hover:bg-white/70 md:hidden"
             onClick={() => setOpen((value) => !value)}
             aria-expanded={open}

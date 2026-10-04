@@ -88,7 +88,7 @@ export default function SitePreparationComparison() {
       aria-label="Site preparation before and after comparison"
     >
       <img
-        src="/site-photos/process/site-preparation-after.jpg"
+        src="/site-photos/process/site-preparation-after.webp?v=20261005"
         alt="Aerial view of the construction site after the land was cleared and levelled"
         width="1536"
         height="1024"
@@ -98,7 +98,7 @@ export default function SitePreparationComparison() {
       />
       <div className="comparison-before-layer" aria-hidden="true">
         <img
-          src="/site-photos/process/site-preparation-before.jpg"
+          src="/site-photos/process/site-preparation-before.webp?v=20261005"
           alt=""
           width="1536"
           height="1024"

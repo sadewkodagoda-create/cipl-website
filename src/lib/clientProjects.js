@@ -1,4 +1,4 @@
-const PROJECT_PHOTO_VERSION = "20261004";
+const PROJECT_PHOTO_VERSION = "20261005";
 
 function createPhotos(slug, projectName, dimensions) {
   return dimensions.map(([width, height], index) => {

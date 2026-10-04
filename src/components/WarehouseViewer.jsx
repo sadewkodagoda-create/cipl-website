@@ -3,6 +3,7 @@ import React, {
   Suspense,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react";
 import { Canvas } from "@react-three/fiber";
@@ -13,7 +14,9 @@ import {
   useProgress,
 } from "@react-three/drei";
 import { Cube, WarningCircle } from "@phosphor-icons/react";
-import { useReducedMotion } from "framer-motion";
+import { useInView } from "framer-motion";
+import useMotionPreference from "../hooks/useMotionPreference";
+import ModelEmptyState from "./ModelEmptyState";
 import * as THREE from "three";
 
 const MODEL_DIAMETER = 11;
@@ -138,21 +141,6 @@ class ModelErrorBoundary extends Component {
   }
 }
 
-function EmptyModel({ message }) {
-  return (
-    <div className="model-viewer-empty">
-      <span>
-        <Cube size={34} weight="thin" />
-      </span>
-      <h3>No 3D model published yet</h3>
-      <p>
-        {message ||
-          "The first construction model will appear here after it is published by the project team."}
-      </p>
-    </div>
-  );
-}
-
 function BrokenModel() {
   return (
     <div className="model-viewer-empty model-viewer-error" role="alert">
@@ -184,14 +172,16 @@ export default function WarehouseViewer({
   uploadedAt,
   emptyMessage,
 }) {
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useMotionPreference();
+  const container = useRef(null);
+  const active = useInView(container, { margin: "100px 0px" });
   const [readyModelUrl, setReadyModelUrl] = useState(null);
-  if (!modelUrl) return <EmptyModel message={emptyMessage} />;
+  if (!modelUrl) return <ModelEmptyState message={emptyMessage} />;
   const modelLoading = readyModelUrl !== modelUrl;
 
   return (
     <ModelErrorBoundary key={modelUrl} fallback={<BrokenModel />}>
-      <div className="construction-model-viewer" aria-busy={modelLoading}>
+      <div ref={container} className="construction-model-viewer" aria-busy={modelLoading}>
         <div className="model-viewer-caption">
           <p>3D construction update</p>
           <strong>{title || "Latest model"}</strong>
@@ -204,7 +194,7 @@ export default function WarehouseViewer({
         <Canvas
           camera={{ position: [10.5, 9, 12], fov: 40, near: 0.05, far: 200 }}
           dpr={[1, 1.25]}
-          frameloop={reduceMotion ? "demand" : "always"}
+          frameloop={reduceMotion || !active ? "demand" : "always"}
           gl={{ antialias: true, powerPreference: "high-performance" }}
         >
           <color attach="background" args={["#dfe9ef"]} />
@@ -230,7 +220,7 @@ export default function WarehouseViewer({
           />
           <OrbitControls
             makeDefault
-            autoRotate={!reduceMotion}
+            autoRotate={!reduceMotion && active}
             autoRotateSpeed={0.28}
             target={[MODEL_STAGE_OFFSET_X, 0.55, 0]}
             minDistance={2}

@@ -9,8 +9,9 @@ export default function Reveal({
   index = 0,
   kind = "card",
   hover = false,
+  photo,
 }) {
-  const { ref, progress, momentum, reduceMotion } = useScrollFrame();
+  const { ref, progress, active, momentum, reduceMotion } = useScrollFrame();
   const bounds = useRef(null);
   const pointerX = useMotionValue(0);
   const pointerY = useMotionValue(0);
@@ -25,7 +26,7 @@ export default function Reveal({
         : progress.get() + (0.5 - progress.get()) * focus.get(),
       kind,
       index,
-      reduceMotion ? 0 : (momentum?.get() ?? 0) * (1 - focus.get()),
+      reduceMotion || !active ? 0 : (momentum?.get() ?? 0) * (1 - focus.get()),
     ),
   );
   const rotateX = useTransform(
@@ -82,6 +83,7 @@ export default function Reveal({
               rotateY,
               scale,
               transformPerspective: 1100,
+              willChange: active ? "transform" : undefined,
               "--media-scale": mediaScale,
               "--number-scale": numberScale,
               "--copy-scale": copyScale,
@@ -90,6 +92,7 @@ export default function Reveal({
             }
       }
       onPointerEnter={(event) => {
+        if (!hover || reduceMotion || event.pointerType !== "mouse") return;
         const rect = event.currentTarget.getBoundingClientRect();
         bounds.current = {
           left: rect.left,
@@ -111,6 +114,18 @@ export default function Reveal({
         if (!event.currentTarget.contains(event.relatedTarget)) focused.set(0);
       }}
     >
+      {photo && (
+        <img
+          className="card-photo"
+          src={photo}
+          alt=""
+          aria-hidden="true"
+          width="900"
+          height="600"
+          loading="lazy"
+          decoding="async"
+        />
+      )}
       {children}
       {kind !== "copy" && <span className="surface-rule" aria-hidden="true" />}
     </motion.div>

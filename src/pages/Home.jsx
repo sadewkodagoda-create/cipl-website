@@ -15,6 +15,7 @@ import {
   UsersThree,
 } from "@phosphor-icons/react";
 import Reveal from "../components/Reveal";
+import InquiryForm from "../components/InquiryForm";
 import ScrollMotion from "../components/ScrollMotion";
 import ScrollHeading from "../components/ScrollHeading";
 import HeroMotion from "../components/HeroMotion";
@@ -23,37 +24,34 @@ import SitePreparationComparison from "../components/SitePreparationComparison";
 import ProjectLocations from "../components/ProjectLocations";
 import { CLIENT_PROJECTS } from "../lib/clientProjects";
 import { STAGES } from "../lib/constants";
-import { isSupabaseConfigured, supabase } from "../lib/supabase";
-import heroBackground from "../assets/cipl-warehouse-aerial.jpg";
-import heroExtendedBackground from "../assets/cipl-warehouse-extended.webp";
+import hero800 from "../assets/cipl-warehouse-aerial-800.webp";
+import hero1600 from "../assets/cipl-warehouse-aerial-1600.webp";
+import hero2400 from "../assets/cipl-warehouse-aerial-2400.webp";
+import hero3200 from "../assets/cipl-warehouse-aerial-3200.webp";
+import heroAvif800 from "../assets/cipl-warehouse-aerial-800.avif";
+import heroAvif1600 from "../assets/cipl-warehouse-aerial-1600.avif";
+import heroAvif2400 from "../assets/cipl-warehouse-aerial-2400.avif";
+import heroAvif3200 from "../assets/cipl-warehouse-aerial-3200.avif";
+import heroExtendedBackground from "../assets/cipl-warehouse-extended-optimized.webp";
 
 const ProjectGallery = lazy(() => import("../components/ProjectGallery"));
-
-const EMPTY_INQUIRY = {
-  name: "",
-  company: "",
-  email: "",
-  phone: "",
-  message: "",
-  website: "",
-};
 
 const clients = [
   {
     name: "TVS Lanka",
-    src: "/clients/tvs-lanka.jpg",
+    src: "/clients/tvs-lanka.webp",
     className: "h-16 w-16 rounded-full",
     project: CLIENT_PROJECTS.tvs,
   },
   {
     name: "Rocell",
-    src: "/clients/rocell.jpg",
+    src: "/clients/rocell.webp",
     className: "h-16 w-16",
     project: CLIENT_PROJECTS.rocell,
   },
   {
     name: "Spa Ceylon",
-    src: "/clients/spa-ceylon-optimized.webp",
+    src: "/clients/spa-ceylon.webp",
     className: "h-16 w-full max-w-[180px]",
     project: CLIENT_PROJECTS.spaCeylon,
   },
@@ -64,13 +62,13 @@ const clients = [
   },
   {
     name: "Space Logistics",
-    src: "/clients/space-logistics-navy.webp",
+    src: "/clients/space-logistics.webp",
     className: "h-12 w-full max-w-[180px]",
     project: CLIENT_PROJECTS.spaceLogistics,
   },
   {
     name: "KAP",
-    src: "/clients/kap-logo.png",
+    src: "/clients/kap.webp",
     className: "h-14 w-full max-w-[160px]",
   },
 ];
@@ -115,35 +113,38 @@ const advantages = [
     "Made around you",
     "Your dimensions, workflow and operating requirements define the build, not a catalogue.",
     "why-card-tailored",
+    "/site-photos/why/tailored-planning.webp?v=20261005",
   ],
   [
     Buildings,
     "One accountable partner",
     "We build and rent the facility, removing the disconnect between contractor and landlord.",
     "why-card-partner",
+    "/site-photos/why/accountable-partner.webp?v=20261005",
   ],
   [
     Camera,
     "Progress you can see",
     "Follow every construction stage, view site photography and explore your warehouse in 3D.",
     "why-card-progress",
+    "/site-photos/why/visible-progress.webp?v=20261005",
   ],
   [
     ShieldCheck,
     "Experience that compounds",
     "Since 2013, our field knowledge has translated into clearer decisions and dependable handovers.",
     "why-card-experience",
+    "/site-photos/why/experienced-team.webp?v=20261005",
   ],
 ];
 
-const stagePhotos = [
-  "/site-photos/process/site-preparation.webp",
-  "/site-photos/process/foundation.webp",
-  "/site-photos/process/structural-framework.webp",
-  "/site-photos/process/wall-construction.webp",
-  "/site-photos/process/roofing.webp",
-  "/site-photos/process/interior-completion.webp",
-];
+const stagePhotos = {
+  Foundation: "/site-photos/process/foundation.webp?v=20261005",
+  "Structural Framework": "/site-photos/process/structural-framework.webp?v=20261005",
+  "Wall Construction": "/site-photos/process/wall-construction.webp?v=20261005",
+  Roofing: "/site-photos/process/roofing.webp?v=20261005",
+  "Interior Completion": "/site-photos/process/interior-completion.webp?v=20261005",
+};
 
 const processStages = STAGES.filter((stage) => stage !== "Completed");
 
@@ -166,27 +167,7 @@ function Statistic({ to, suffix = "", unit = "", useGrouping = true }) {
 export default function Home() {
   const reduceMotion = useMotionPreference();
   const location = useLocation();
-  const [form, setForm] = useState(EMPTY_INQUIRY);
-  const [state, setState] = useState("idle");
   const [activeProject, setActiveProject] = useState(null);
-
-  const submit = async (event) => {
-    event.preventDefault();
-    setState("loading");
-    if (!isSupabaseConfigured) {
-      setState("error");
-      return;
-    }
-    try {
-      const { data, error } = await supabase.functions.invoke(
-        "submit-inquiry",
-        { body: form },
-      );
-      setState(error || !data?.success ? "error" : "success");
-    } catch {
-      setState("error");
-    }
-  };
 
   useEffect(() => {
     if (location.hash !== "#contact") return undefined;
@@ -209,15 +190,24 @@ export default function Home() {
             }}
           >
             <div aria-hidden="true" className="hero-extension" />
-            <img
-              src={heroBackground}
-              alt="Aerial view of CIPL warehouses surrounded by greenery"
-              width="1600"
-              height="914"
-              fetchPriority="high"
-              decoding="async"
-              className="hero-image absolute inset-0 h-full w-full object-cover"
-            />
+            <picture>
+              <source
+                type="image/avif"
+                srcSet={`${heroAvif800} 800w, ${heroAvif1600} 1600w, ${heroAvif2400} 2400w, ${heroAvif3200} 3200w`}
+                sizes="100vw"
+              />
+              <img
+                src={hero1600}
+                srcSet={`${hero800} 800w, ${hero1600} 1600w, ${hero2400} 2400w, ${hero3200} 3200w`}
+                sizes="100vw"
+                alt="Aerial view of CIPL warehouses surrounded by greenery"
+                width="3200"
+                height="1828"
+                fetchPriority="high"
+                decoding="async"
+                className="hero-image absolute inset-0 h-full w-full object-cover"
+              />
+            </picture>
           </div>
           <div className="hero-content shell relative grid items-end gap-8 py-10 lg:grid-cols-12 lg:gap-10">
             <Reveal kind="copy" className="hero-copy lg:col-span-8">
@@ -276,11 +266,12 @@ export default function Home() {
             <Reveal kind="photo" className="stats-photo-card" hover>
               <div className="stats-photo-frame">
                 <img
-                  src="/site-photos/cipl-workforce-generated.webp"
+                  src="/site-photos/cipl-workforce-generated.webp?v=20261005"
                   alt="Sri Lankan warehouse construction workforce during a site briefing"
                   width="1536"
                   height="1024"
                   loading="lazy"
+                  decoding="async"
                   className="h-full w-full object-cover"
                 />
               </div>
@@ -336,6 +327,7 @@ export default function Home() {
         </section>
 
         <section className="section clients-section">
+          <img className="section-photo" src="/site-photos/clients-background.webp?v=20261005" alt="" aria-hidden="true" width="1920" height="1080" loading="lazy" decoding="async" />
           <div className="shell">
             <Reveal kind="copy">
               <ScrollHeading className="max-w-3xl text-4xl tracking-[-.045em] md:text-5xl">
@@ -427,12 +419,13 @@ export default function Home() {
             </Reveal>
             <div className="why-grid mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-12">
               {advantages.map(
-                ([Icon, title, description, className], index) => (
+                ([Icon, title, description, className, photo], index) => (
                   <Reveal
                     key={title}
                     index={index}
                     className={`why-card ${className} ${index === 0 || index === 2 ? "lg:col-span-7" : "lg:col-span-5"}`}
                     hover
+                    photo={photo}
                   >
                     <span className="why-icon">
                       <Icon size={29} weight="regular" />
@@ -456,6 +449,7 @@ export default function Home() {
         </section>
 
         <section className="section process-section">
+          <img className="section-photo" src="/site-photos/process-completed-warehouse.webp?v=20261005" alt="" aria-hidden="true" width="1920" height="1080" loading="lazy" decoding="async" />
           <div className="shell">
             <Reveal kind="copy">
               <p className="eyebrow">From ground to handover</p>
@@ -480,7 +474,7 @@ export default function Home() {
                   ) : (
                     <>
                       <img
-                        src={stagePhotos[index]}
+                        src={stagePhotos[stage]}
                         alt=""
                         aria-hidden="true"
                         loading="lazy"
@@ -518,7 +512,7 @@ export default function Home() {
           <div className="shell grid items-stretch gap-6 lg:grid-cols-12">
             <Reveal kind="photo" className="contact-story lg:col-span-5" hover>
               <img
-                src="/site-photos/interior-1.webp"
+                src="/site-photos/interior-1.webp?v=20261005"
                 alt="Completed CIPL warehouse interior"
                 loading="lazy"
                 width="1122"
@@ -552,119 +546,7 @@ export default function Home() {
               index={1}
               className="glass-panel p-6 md:p-9 lg:col-span-7"
             >
-              <form onSubmit={submit} aria-live="polite">
-                {state === "success" ? (
-                  <div className="grid min-h-[500px] place-items-center text-center">
-                    <div>
-                      <CheckCircle
-                        size={48}
-                        weight="thin"
-                        className="mx-auto text-[var(--gold-dark)]"
-                      />
-                      <h3 className="heading mt-5 text-2xl">
-                        Inquiry received.
-                      </h3>
-                      <p className="mt-2 text-slate-600">
-                        Thank you. The CIPL team will be in touch shortly.
-                      </p>
-                      <button
-                        type="button"
-                        className="btn btn-outline mt-6"
-                        onClick={() => {
-                          setState("idle");
-                          setForm(EMPTY_INQUIRY);
-                        }}
-                      >
-                        Send another
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <div
-                      className="absolute -left-[10000px] h-px w-px overflow-hidden"
-                      aria-hidden="true"
-                    >
-                      <label htmlFor="contact-website">Website</label>
-                      <input
-                        id="contact-website"
-                        name="website"
-                        tabIndex={-1}
-                        autoComplete="off"
-                        value={form.website}
-                        onChange={(event) =>
-                          setForm({ ...form, website: event.target.value })
-                        }
-                      />
-                    </div>
-                    <div className="grid gap-5 sm:grid-cols-2">
-                      {[
-                        ["Name", "name", "text"],
-                        ["Company", "company", "text"],
-                        ["Email", "email", "email"],
-                        ["Phone", "phone", "tel"],
-                      ].map(([label, name, type]) => (
-                        <label key={name}>
-                          <span className="label">{label}</span>
-                          <input
-                            className="field"
-                            name={name}
-                            required={name !== "company"}
-                            type={type}
-                            maxLength={
-                              name === "email"
-                                ? 254
-                                : name === "phone"
-                                  ? 40
-                                  : 120
-                            }
-                            autoComplete={
-                              name === "name"
-                                ? "name"
-                                : name === "company"
-                                  ? "organization"
-                                  : name === "phone"
-                                    ? "tel"
-                                    : name
-                            }
-                            value={form[name]}
-                            onChange={(event) =>
-                              setForm({ ...form, [name]: event.target.value })
-                            }
-                          />
-                        </label>
-                      ))}
-                    </div>
-                    <label className="mt-5 block">
-                      <span className="label">Message</span>
-                      <textarea
-                        className="field min-h-32 resize-y"
-                        name="message"
-                        autoComplete="off"
-                        required
-                        maxLength="5000"
-                        value={form.message}
-                        onChange={(event) =>
-                          setForm({ ...form, message: event.target.value })
-                        }
-                      />
-                    </label>
-                    {state === "error" && (
-                      <p className="mt-3 text-red-700" role="alert">
-                        We couldn't send this inquiry. Please call or email us
-                        directly.
-                      </p>
-                    )}
-                    <button
-                      disabled={state === "loading"}
-                      className="btn btn-primary mt-6 w-full sm:w-auto"
-                    >
-                      {state === "loading" ? "Sending..." : "Send inquiry"}{" "}
-                      <ArrowRight size={18} />
-                    </button>
-                  </>
-                )}
-              </form>
+              <InquiryForm />
             </Reveal>
           </div>
         </section>

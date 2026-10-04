@@ -69,7 +69,7 @@ function Login({ onLogin, initialError = "" }) {
     setError("");
     if (!isSupabaseConfigured) {
       setLoading(false);
-      setError("Connect Supabase in .env to authenticate.");
+      setError("Sign-in is temporarily unavailable. Please contact CIPL.");
       return;
     }
     try {

@@ -1,7 +1,7 @@
-import { lazy, Suspense } from "react";
-import { Navigate, Routes, Route } from "react-router-dom";
+import { lazy, Suspense, useLayoutEffect, useRef } from "react";
+import { Navigate, Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
-const Home = lazy(() => import("./pages/Home"));
+import Home from "./pages/Home";
 const AdminPortal = lazy(() => import("./pages/AdminPortal"));
 const ClientPortal = lazy(() => import("./pages/ClientPortal"));
 const Loader = () => (
@@ -13,6 +13,15 @@ const Loader = () => (
   </div>
 );
 export default function App() {
+  const { pathname } = useLocation();
+  const previousPath = useRef(pathname);
+  useLayoutEffect(() => {
+    if (previousPath.current !== pathname) {
+      window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+      previousPath.current = pathname;
+    }
+  }, [pathname]);
+
   return (
     <>
       <Navbar />

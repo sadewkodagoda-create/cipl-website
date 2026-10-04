@@ -32,3 +32,11 @@ Client usernames are converted internally to `<username>@cipl.lk`. New client pa
 ## Verification
 
 Run `pnpm test`, `pnpm lint`, and `pnpm build` before deployment. Test `/`, `/client`, and `/admin` as direct URLs after deployment to confirm the SPA fallback and security headers are active.
+
+## Frontend performance
+
+- The hero uses responsive AVIF images with WebP fallbacks at 800, 1600, 2400 and 3200 pixels. Keep image masters and one-off processing scripts outside the repository.
+- Decorative photos load near their sections. Public photo URLs carry a version query; update it when replacing cached photos. Gallery versions live in `src/lib/clientProjects.js`.
+- Scroll surfaces subscribe only near the viewport and honor live reduced-motion preferences. Satellite images pan and zoom with fixed dimensions and transforms.
+- Inquiry fields keep their state in a separate component. The database client loads when the form receives focus or submits.
+- The 3D viewer loads only for an available model near the viewport. Continuous rendering stops offscreen and under reduced motion; projects without a model use a lightweight empty state.

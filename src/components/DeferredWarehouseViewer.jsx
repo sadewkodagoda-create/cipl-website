@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import ModelEmptyState from "./ModelEmptyState";
 
 let viewerModulePromise;
 
@@ -28,18 +29,6 @@ export default function DeferredWarehouseViewer(props) {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const preload = () => void loadWarehouseViewer();
-
-    if ("requestIdleCallback" in window) {
-      const idleId = window.requestIdleCallback(preload, { timeout: 1200 });
-      return () => window.cancelIdleCallback(idleId);
-    }
-
-    const timerId = window.setTimeout(preload, 0);
-    return () => window.clearTimeout(timerId);
-  }, []);
-
-  useEffect(() => {
     const node = container.current;
     if (!node || visible) return;
 
@@ -55,11 +44,13 @@ export default function DeferredWarehouseViewer(props) {
           observer.disconnect();
         }
       },
-      { rootMargin: "1200px 0px" },
+      { rootMargin: "600px 0px" },
     );
     observer.observe(node);
     return () => observer.disconnect();
-  }, [visible]);
+  }, [visible, props.modelUrl]);
+
+  if (!props.modelUrl) return <ModelEmptyState message={props.emptyMessage} />;
 
   return (
     <div ref={container}>

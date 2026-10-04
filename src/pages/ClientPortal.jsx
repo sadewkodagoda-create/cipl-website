@@ -52,7 +52,7 @@ function Login({ onLogin, initialError = "" }) {
     setBusy(true);
     setError("");
     if (!isSupabaseConfigured) {
-      setError("Connect Supabase in .env to authenticate.");
+      setError("Sign-in is temporarily unavailable. Please contact CIPL.");
       setBusy(false);
       return;
     }

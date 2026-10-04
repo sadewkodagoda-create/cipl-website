@@ -28,8 +28,8 @@ export default function PortalLogin({
   const [showPassword, setShowPassword] = useState(false);
   const isAdmin = variant === "admin";
   const image = isAdmin
-    ? "/site-photos/building-structure.webp"
-    : "/site-photos/interior-1.webp";
+    ? "/site-photos/building-structure.webp?v=20261005"
+    : "/site-photos/interior-1.webp?v=20261005";
 
   return (
     <main
@@ -56,7 +56,7 @@ export default function PortalLogin({
         <header className="portal-login-header">
           <Link to="/" className="portal-login-brand" aria-label="CIPL home">
             <span className="portal-login-logo">
-              <img src="/cipl-logo.jpg" alt="CIPL" />
+              <img src="/cipl-logo.webp" alt="CIPL" />
             </span>
             <span>
               <strong>Chanithu International</strong>

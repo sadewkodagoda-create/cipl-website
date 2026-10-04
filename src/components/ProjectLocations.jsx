@@ -3,6 +3,7 @@ import {
   motion,
   useMotionValue,
   useMotionValueEvent,
+  useInView,
   useScroll,
   useSpring,
   useTransform,
@@ -24,21 +25,22 @@ import {
 const STAGES = ["Sri Lanka", "Western Province", "Our projects"];
 const STAGE_PROGRESS = [0, 0.55, 0.93];
 
-function SatelliteLayer({ layer, progress, camera, size }) {
+function SatelliteLayer({ layer, progress, camera, size, enabled }) {
   const [loaded, setLoaded] = useState(false);
   const [west, south, east, north] = layer.bounds;
   const nw = mercatorPoint(west, north);
   const se = mercatorPoint(east, south);
-  const left = useTransform(
+  const x = useTransform(
     camera,
     (value) => size.width / 2 + (nw.x - value.x) * value.scale,
   );
-  const top = useTransform(
+  const y = useTransform(
     camera,
     (value) => size.height / 2 + (nw.y - value.y) * value.scale,
   );
-  const width = useTransform(camera, (value) => (se.x - nw.x) * value.scale);
-  const height = useTransform(camera, (value) => (se.y - nw.y) * value.scale);
+  // Keep the raster's dimensions fixed: zoom and pan can then be composited
+  // instead of changing layout and repainting every satellite image each frame.
+  const scale = useTransform(camera, (value) => (se.x - nw.x) * value.scale / layer.width);
   const opacity = useTransform(progress, (value) =>
     !loaded
       ? 0
@@ -50,18 +52,22 @@ function SatelliteLayer({ layer, progress, camera, size }) {
   return (
     <motion.img
       className="project-map-satellite"
-      src={layer.src}
+      src={enabled ? layer.src : undefined}
       alt=""
       loading="lazy"
       decoding="async"
       draggable="false"
+      width={layer.width}
+      height={layer.height}
       onLoad={() => setLoaded(true)}
       onError={() => setLoaded(false)}
       style={{
-        left,
-        top,
-        width,
-        height,
+        x,
+        y,
+        width: layer.width,
+        height: layer.width * (se.y - nw.y) / (se.x - nw.x),
+        scale,
+        transformOrigin: "0 0",
         opacity,
       }}
     />
@@ -141,6 +147,7 @@ function ProjectMarker({
 export default function ProjectLocations({ onOpenProject }) {
   const journeyRef = useRef(null);
   const canvasRef = useRef(null);
+  const loadImagery = useInView(canvasRef, { margin: "600px 0px", once: true });
   const reduceMotion = useMotionPreference();
   const [size, setSize] = useState({ width: 1000, height: 520 });
   const [activeId, setActiveId] = useState(null);
@@ -165,9 +172,14 @@ export default function ProjectLocations({ onOpenProject }) {
     Math.min(1, Math.max(0, value)),
   );
 
-  useMotionValueEvent(progress, "change", (value) =>
-    setStage(projectMapStage(value)),
-  );
+  const stageRef = useRef(stage);
+  useMotionValueEvent(progress, "change", (value) => {
+    const nextStage = projectMapStage(value);
+    if (stageRef.current !== nextStage) {
+      stageRef.current = nextStage;
+      setStage(nextStage);
+    }
+  });
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -181,7 +193,8 @@ export default function ProjectLocations({ onOpenProject }) {
   }, []);
 
   useEffect(() => {
-    setStage(projectMapStage(progress.get()));
+    stageRef.current = projectMapStage(progress.get());
+    setStage(stageRef.current);
   }, [progress, reduceMotion]);
 
   const goToStage = (index) => {
@@ -239,6 +252,7 @@ export default function ProjectLocations({ onOpenProject }) {
                     progress={progress}
                     camera={camera}
                     size={size}
+                    enabled={loadImagery}
                   />
                 ))}
               </div>
