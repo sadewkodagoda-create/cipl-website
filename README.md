@@ -2,6 +2,8 @@
 
 React + Vite corporate site with Supabase-backed admin/client portals and a Three.js warehouse viewer.
 
+The public entry at `/` lets visitors choose CIPL Construction (`/construction`) or CIPL Logistics (`/logistics`). Logistics displays the distribution center photos, an interactive satellite location map, and contact details. Construction keeps its existing site and direct `/client` and `/admin` portal URLs. Old `/#contact` links continue to the construction contact section. Company selection does not change authentication or store a preferred company.
+
 ## Setup
 
 1. Copy `.env.example` to `.env` and add the project URL and publishable key.
@@ -31,7 +33,7 @@ Client usernames are converted internally to `<username>@cipl.lk`. New client pa
 
 ## Verification
 
-Run `pnpm test`, `pnpm lint`, and `pnpm build` before deployment. Test `/`, `/client`, and `/admin` as direct URLs after deployment to confirm the SPA fallback and security headers are active.
+Run `pnpm test`, `pnpm lint`, and `pnpm build` before deployment. Test `/`, `/construction`, `/logistics`, `/client`, and `/admin` as direct URLs after deployment to confirm the SPA fallback and security headers are active. Also check both company cards, the company switcher, the legacy `/#contact` link, logistics map zoom and pan controls, and the map logo and contact link destinations.
 
 ## Frontend performance
 

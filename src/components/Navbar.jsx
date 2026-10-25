@@ -1,10 +1,10 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { List, X } from "@phosphor-icons/react";
+import { List, SquaresFour, X } from "@phosphor-icons/react";
 import useMotionPreference from "../hooks/useMotionPreference";
 
 const NAV_ITEMS = [
-  ["Home", "/"],
+  ["Home", "/construction"],
   ["Client Portal", "/client"],
   ["Admin Portal", "/admin"],
 ];
@@ -47,12 +47,12 @@ export default function Navbar() {
 
   const contact = () => {
     setOpen(false);
-    if (location.pathname === "/") {
+    if (location.pathname === "/construction") {
       document
         .querySelector("#contact")
         ?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
     } else {
-      navigate("/#contact");
+      navigate("/construction#contact");
     }
   };
 
@@ -74,7 +74,7 @@ export default function Navbar() {
           aria-label="Primary"
         >
           <Link
-            to="/"
+            to="/construction"
             className="flex min-w-0 items-center gap-3 text-[var(--ink)]"
             onClick={() => setOpen(false)}
           >
@@ -122,6 +122,16 @@ export default function Navbar() {
                 </Link>
               );
             })}
+            <Link
+              to="/"
+              onClick={() => setOpen(false)}
+              className="nav-menu-link flex min-h-11 min-w-11 items-center gap-2 rounded-full px-3 text-sm text-slate-600 hover:text-[var(--ink)]"
+              aria-label="Choose a company"
+              title="Choose a company"
+            >
+              <SquaresFour size={19} aria-hidden="true" />
+              <span className="md:sr-only">Choose a company</span>
+            </Link>
             <button onClick={contact} className="btn btn-primary nav-contact">
               Contact us
             </button>

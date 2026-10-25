@@ -54,7 +54,11 @@ export default function PortalLogin({
         aria-labelledby={`${variant}-portal-title`}
       >
         <header className="portal-login-header">
-          <Link to="/" className="portal-login-brand" aria-label="CIPL home">
+          <Link
+            to="/construction"
+            className="portal-login-brand"
+            aria-label="CIPL Construction home"
+          >
             <span className="portal-login-logo">
               <img src="/cipl-logo.webp" alt="CIPL" />
             </span>
