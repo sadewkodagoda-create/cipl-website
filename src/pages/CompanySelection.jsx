@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { ArrowRight } from "@phosphor-icons/react";
-import CompanyBrand from "../components/CompanyBrand";
 
 const companies = [
   {
@@ -33,8 +32,7 @@ export default function CompanySelection() {
       <a href="#main-content" className="skip-link">
         Skip to company selection
       </a>
-      <header className="company-header company-width">
-        <CompanyBrand />
+      <header className="company-header company-selection-header company-width">
         <Link to="/construction#contact" className="company-contact-link">
           Get in touch <ArrowRight size={17} aria-hidden="true" />
         </Link>

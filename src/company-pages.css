@@ -22,6 +22,9 @@
   gap: 1.5rem;
   padding-block: 1.65rem;
 }
+.company-selection-header {
+  justify-content: flex-end;
+}
 .company-brand {
   display: inline-flex;
   align-items: center;
