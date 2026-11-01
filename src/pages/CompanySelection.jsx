@@ -2,6 +2,7 @@ import { useRef } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "@phosphor-icons/react";
 import CompanyBackdrop from "../components/CompanyBackdrop";
+import CompanySelectionNav from "../components/CompanySelectionNav";
 import CirvelCredit from "../components/CirvelCredit";
 
 const companies = [
@@ -38,11 +39,7 @@ export default function CompanySelection() {
       <a href="#main-content" className="skip-link">
         Skip to company selection
       </a>
-      <header className="company-header company-selection-header company-width">
-        <Link to="/construction#contact" className="company-contact-link">
-          Get in touch <ArrowRight size={17} aria-hidden="true" />
-        </Link>
-      </header>
+      <CompanySelectionNav />
 
       <main id="main-content" className="company-main company-width">
         <div className="company-intro">

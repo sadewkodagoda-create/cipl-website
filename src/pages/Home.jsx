@@ -171,10 +171,10 @@ export default function Home() {
   const [activeProject, setActiveProject] = useState(null);
 
   useEffect(() => {
-    if (location.hash !== "#contact") return undefined;
+    if (!["#contact", "#about"].includes(location.hash)) return undefined;
     const timer = window.setTimeout(() => {
       document
-        .querySelector("#contact")
+        .querySelector(location.hash)
         ?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
     }, 100);
     return () => window.clearTimeout(timer);
@@ -262,7 +262,11 @@ export default function Home() {
           </div>
         </HeroMotion>
 
-        <section className="stats-section py-12 md:py-16">
+        <section
+          id="about"
+          aria-label="About CIPL"
+          className="stats-section scroll-mt-24 py-12 md:py-16"
+        >
           <div className="stats-showcase shell grid gap-4 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1.35fr)]">
             <Reveal kind="photo" className="stats-photo-card" hover>
               <div className="stats-photo-frame">

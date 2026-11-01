@@ -14,9 +14,19 @@ const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
 function GradientClouds() {
   return (
     <>
-      <div className="company-gradient-cloud company-gradient-cloud-gold" />
-      <div className="company-gradient-cloud company-gradient-cloud-honey" />
+      <div className="company-gradient-cloud company-gradient-cloud-blue" />
+      <div className="company-gradient-cloud company-gradient-cloud-warm" />
       <div className="company-gradient-cloud company-gradient-cloud-white" />
+      <div className="company-gradient-structure">
+        <img
+          src="/site-photos/building-structure.webp"
+          width="1122"
+          height="1402"
+          alt=""
+          decoding="async"
+          draggable="false"
+        />
+      </div>
     </>
   );
 }
