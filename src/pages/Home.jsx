@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
+import CirvelCredit from "../components/CirvelCredit";
 import {
   ArrowRight,
   Blueprint,
@@ -554,12 +555,13 @@ export default function Home() {
         <footer className="site-footer py-8 text-slate-600">
           <Reveal
             kind="copy"
-            className="shell flex flex-col justify-between gap-3 text-sm sm:flex-row"
+            className="shell flex flex-col items-start justify-between gap-3 text-sm sm:flex-row sm:flex-wrap sm:items-center"
           >
             <p>
               © {new Date().getFullYear()} Chanithu International (Pvt) Ltd.
             </p>
             <p>Warehouses, built around your business.</p>
+            <CirvelCredit />
           </Reveal>
         </footer>
       </main>

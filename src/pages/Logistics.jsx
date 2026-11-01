@@ -8,6 +8,7 @@ import {
   Phone,
 } from "@phosphor-icons/react";
 import CompanyBrand from "../components/CompanyBrand";
+import CirvelCredit from "../components/CirvelCredit";
 import LogisticsLocationMap from "../components/LogisticsLocationMap";
 import { LOGISTICS_LOCATION } from "../lib/logisticsLocation";
 import aerialView from "../assets/logistics/distribution-center-aerial.webp";
@@ -146,8 +147,9 @@ export default function Logistics() {
       </main>
 
       <footer className="company-footer company-width">
-        <p>© {new Date().getFullYear()} Chanithu International</p>
+        <p>© {new Date().getFullYear()} Chanithu International (Pvt) Ltd.</p>
         <Link to="/">CIPL Construction &amp; CIPL Logistics</Link>
+        <CirvelCredit />
       </footer>
     </div>
   );

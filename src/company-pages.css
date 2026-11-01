@@ -11,6 +11,135 @@
   color: var(--ink);
 }
 
+.company-selection-shell {
+  /* Warm gold sampled from the construction logo, softened by ivory and white. */
+  --selection-gold: 224, 160, 8;
+  --company-muted: #3b4c5f;
+  position: relative;
+  isolation: isolate;
+  background: #faf9f5;
+}
+.company-selection-shell
+  > :is(.company-header, .company-main, .company-footer) {
+  position: relative;
+  z-index: 1;
+}
+.company-backdrop {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  contain: paint;
+  background: linear-gradient(
+    145deg,
+    #ffffff 3%,
+    #faf8f0 48%,
+    #fffdf7 78%,
+    #ffffff
+  );
+}
+.company-gradient-field {
+  position: absolute;
+  inset: -18%;
+  transform-origin: 50% 50%;
+}
+.company-gradient-cloud {
+  position: absolute;
+  pointer-events: none;
+  will-change: transform;
+}
+.company-gradient-cloud-gold {
+  top: -32%;
+  left: -38%;
+  width: 125%;
+  height: 140%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(var(--selection-gold), 0.47) 0%,
+    rgba(var(--selection-gold), 0.23) 31%,
+    rgba(var(--selection-gold), 0.07) 52%,
+    rgba(var(--selection-gold), 0) 72%
+  );
+  animation: company-gold-drift 24s ease-in-out infinite alternate;
+}
+.company-gradient-cloud-honey {
+  right: -32%;
+  bottom: -42%;
+  width: 118%;
+  height: 135%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(var(--selection-gold), 0.39) 0%,
+    rgba(244, 218, 156, 0.22) 35%,
+    rgba(255, 255, 255, 0) 70%
+  );
+  animation: company-honey-drift 31s ease-in-out -11s infinite alternate;
+}
+.company-gradient-cloud-white {
+  top: -25%;
+  right: -24%;
+  width: 125%;
+  height: 140%;
+  background: radial-gradient(
+    ellipse at center,
+    #ffffff 3%,
+    rgba(255, 255, 255, 0.88) 25%,
+    rgba(255, 255, 255, 0.38) 44%,
+    rgba(255, 255, 255, 0) 70%
+  );
+  animation: company-white-drift 28s ease-in-out -8s infinite alternate;
+}
+.company-gradient-response {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+}
+.company-gradient-response > div {
+  width: clamp(28rem, 65vw, 64rem);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(
+    circle,
+    rgba(var(--selection-gold), 0.38),
+    rgba(250, 230, 179, 0.2) 35%,
+    rgba(255, 255, 255, 0) 68%
+  );
+}
+.company-backdrop.is-still .company-gradient-cloud {
+  animation: none;
+  will-change: auto;
+}
+@keyframes company-gold-drift {
+  from {
+    transform: translate3d(-6%, -3%, 0) scale(1.02) rotate(-8deg);
+  }
+  50% {
+    transform: translate3d(14%, 10%, 0) scale(1.15) rotate(6deg);
+  }
+  to {
+    transform: translate3d(26%, -6%, 0) scale(1.04) rotate(14deg);
+  }
+}
+@keyframes company-honey-drift {
+  from {
+    transform: translate3d(8%, 10%, 0) scale(1.08) rotate(5deg);
+  }
+  to {
+    transform: translate3d(-23%, -16%, 0) scale(0.94) rotate(-12deg);
+  }
+}
+@keyframes company-white-drift {
+  from {
+    transform: translate3d(10%, -9%, 0) scale(0.95);
+  }
+  to {
+    transform: translate3d(-22%, 15%, 0) scale(1.14);
+  }
+}
+
 .company-width {
   width: min(100% - 5rem, 1200px);
   margin-inline: auto;
@@ -24,6 +153,9 @@
 }
 .company-selection-header {
   justify-content: flex-end;
+}
+.company-selection-shell .company-contact-link:focus-visible {
+  outline-color: var(--gold-dark);
 }
 .company-brand {
   display: inline-flex;
@@ -878,6 +1010,10 @@ a.logistics-contact-row:hover .logistics-contact-value strong {
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  .company-gradient-cloud {
+    animation: none;
+    will-change: auto;
+  }
   .company-choices {
     animation: none;
   }

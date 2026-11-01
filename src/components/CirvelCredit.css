@@ -1,0 +1,105 @@
+.cirvel-credit,
+.company-footer .cirvel-credit {
+  display: inline-flex;
+  position: relative;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.85rem;
+  width: fit-content;
+  min-height: 44px;
+  padding: 0.35rem 0.4rem 0.35rem 0.9rem;
+  border: 1px solid rgba(16, 41, 68, 0.16);
+  border-radius: 999px;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.52);
+  text-decoration: none;
+  transition:
+    border-color 220ms ease,
+    background 220ms ease,
+    box-shadow 220ms ease,
+    transform 220ms ease;
+}
+.cirvel-credit-copy {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  line-height: 1.2;
+}
+.cirvel-credit-copy > span {
+  color: #536477;
+  font-size: 0.78rem;
+}
+.cirvel-credit-copy strong {
+  position: relative;
+  font-family: "Lexend", sans-serif;
+  font-size: 0.92rem;
+  font-weight: 500;
+  letter-spacing: -0.045em;
+}
+.cirvel-credit-copy strong::after {
+  position: absolute;
+  right: 0;
+  bottom: -4px;
+  left: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--gold);
+  content: "";
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 220ms ease;
+}
+.cirvel-credit-arrow {
+  display: grid;
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--ink);
+  background: rgba(217, 163, 38, 0.12);
+  transition: background 220ms ease;
+}
+.cirvel-credit-arrow svg {
+  transition: transform 220ms ease;
+}
+.cirvel-credit:focus-visible,
+.company-footer .cirvel-credit:focus-visible {
+  border-color: var(--gold-dark);
+  outline: 3px solid var(--gold-dark);
+  outline-offset: 4px;
+}
+.cirvel-credit:focus-visible .cirvel-credit-arrow,
+.cirvel-credit:hover .cirvel-credit-arrow {
+  background: #e8bf5a;
+}
+.cirvel-credit:focus-visible .cirvel-credit-copy strong::after,
+.cirvel-credit:hover .cirvel-credit-copy strong::after {
+  transform: scaleX(1);
+}
+@media (hover: hover) and (pointer: fine) {
+  .cirvel-credit:hover,
+  .company-footer .cirvel-credit:hover {
+    border-color: #cda343;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 5px 18px rgba(107, 76, 17, 0.1);
+    text-decoration: none;
+    transform: translateY(-2px);
+  }
+  .cirvel-credit:hover .cirvel-credit-arrow svg {
+    transform: translate(2px, -2px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cirvel-credit,
+  .cirvel-credit-arrow,
+  .cirvel-credit-arrow svg,
+  .cirvel-credit-copy strong::after {
+    transition: none;
+  }
+  .cirvel-credit:hover,
+  .company-footer .cirvel-credit:hover,
+  .cirvel-credit:hover .cirvel-credit-arrow svg {
+    transform: none;
+  }
+}

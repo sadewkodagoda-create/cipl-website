@@ -1,5 +1,8 @@
+import { useRef } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "@phosphor-icons/react";
+import CompanyBackdrop from "../components/CompanyBackdrop";
+import CirvelCredit from "../components/CirvelCredit";
 
 const companies = [
   {
@@ -27,8 +30,11 @@ const companies = [
 ];
 
 export default function CompanySelection() {
+  const pageRef = useRef(null);
+
   return (
-    <div className="company-shell">
+    <div ref={pageRef} className="company-shell company-selection-shell">
+      <CompanyBackdrop containerRef={pageRef} />
       <a href="#main-content" className="skip-link">
         Skip to company selection
       </a>
@@ -104,7 +110,8 @@ export default function CompanySelection() {
       </main>
 
       <footer className="company-footer company-width">
-        <p>© {new Date().getFullYear()} Chanithu International</p>
+        <p>© {new Date().getFullYear()} Chanithu International (Pvt) Ltd.</p>
+        <CirvelCredit />
       </footer>
     </div>
   );
