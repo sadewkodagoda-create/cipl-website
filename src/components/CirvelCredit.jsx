@@ -1,4 +1,3 @@
-import { ArrowUpRight } from "@phosphor-icons/react";
 import "./CirvelCredit.css";
 
 export default function CirvelCredit() {
@@ -8,14 +7,17 @@ export default function CirvelCredit() {
       href="https://cirvelit.com/"
       target="_blank"
       rel="noopener noreferrer"
-      aria-label="Made by Cirvel. Visit cirvelit.com (opens in a new tab)"
+      aria-label="Built by Cirvel. Visit cirvelit.com (opens in a new tab)"
     >
-      <span className="cirvel-credit-copy">
-        <span>Made by</span>
-        <strong>Cirvel</strong>
-      </span>
-      <span className="cirvel-credit-arrow" aria-hidden="true">
-        <ArrowUpRight size={15} weight="bold" />
+      <span className="cirvel-credit-badge">
+        <img
+          src="/cirvel-built-by-badge.png"
+          alt="Built by Cirvel"
+          width="2172"
+          height="724"
+          loading="lazy"
+          decoding="async"
+        />
       </span>
     </a>
   );
